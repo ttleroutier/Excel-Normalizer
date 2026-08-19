@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Normalisation Excel</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>Normalisation de fichiers Excel</h1>
+    <p class="subtitle">
+        Sélectionnez uniquement les colonnes que vous souhaitez modifier.
+    </p>
+
+    <div id="status" class="status"></div>
+
+    <section class="card">
+        <h2>1. Fichier source</h2>
+        <input id="excelFile" type="file" accept=".xlsx,.xls,.xlsm,.csv">
+        <p class="hint">Le fichier est traité localement dans votre navigateur.</p>
+    </section>
+
+    <section id="scopeCard" class="card">
+        <h2>2. Colonnes à modifier</h2>
+        <p class="hint" style="margin-bottom:10px;">
+            Par défaut, aucune colonne n’est sélectionnée.
+            Cochez uniquement les colonnes à normaliser.
+        </p>
+        <div class="actions" style="margin-bottom:11px;">
+            <button type="button" class="secondary-button" onclick="selectAllSheets(true)">
+                Activer toutes les feuilles
+            </button>
+            <button type="button" class="secondary-button" onclick="selectAllSheets(false)">
+                Désactiver toutes les feuilles
+            </button>
+        </div>
+        <div id="scopePanel"></div>
+    </section>
+
+    <section class="card">
+        <h2>3. Options de normalisation</h2>
+        <div class="field">
+            <label for="spaceMode">Gestion des espaces</label>
+            <select id="spaceMode">
+                <option value="unchanged">Conserver les espaces</option>
+                <option value="trim">Supprimer les espaces au début et à la fin</option>
+                <option value="underscore">Remplacer les espaces par _</option>
+            </select>
+            <p class="hint">Exemple : « Rear Left Door » devient « Rear_Left_Door ».</p>
+        </div>
+        <div class="checkbox-line">
+            <input id="capitalizeFirst" type="checkbox">
+            <label for="capitalizeFirst">Mettre une majuscule au début des cellules sélectionnées</label>
+        </div>
+        <div class="checkbox-line">
+            <input id="ignoreHeaders" type="checkbox" checked>
+            <label for="ignoreHeaders">Ne pas modifier la première ligne</label>
+        </div>
+        <div class="field" style="margin-top:12px;">
+            <label for="protectedTerms">Termes toujours en majuscules</label>
+            <input id="protectedTerms" type="text" value="LHD, RHD" placeholder="LHD, RHD, SUV, OEM">
+            <p class="hint">Séparez les termes par des virgules.</p>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>4. Règles métier</h2>
+        <p class="hint" style="margin-bottom:10px;">
+            L’option « Mot entier » empêche RH de modifier RHD et LH de modifier LHD.
+        </p>
+        <div class="rules-header">
+            <span>Active</span>
+            <span>Rechercher</span>
+            <span>Remplacer</span>
+            <span>Mot entier</span>
+            <span>Casse exacte</span>
+            <span>Action</span>
+        </div>
+        <div id="customRules"></div>
+        <button type="button" class="secondary-button" onclick="addRule()">
+            + Ajouter une règle
+        </button>
+    </section>
+
+    <section class="card">
+        <h2>5. Traitement</h2>
+        <div class="actions">
+            <button id="processButton" type="button">Traiter les colonnes sélectionnées</button>
+            <button id="downloadButton" type="button" disabled>Télécharger le fichier normalisé</button>
+        </div>
+    </section>
+
+    <section id="previewCard" class="card">
+        <div class="preview-header">
+            <div>
+                <h2 style="margin-bottom:4px;">Prévisualisation</h2>
+                <span id="previewCounter" class="hint"></span>
+            </div>
+            <select id="sheetSelector" style="max-width:280px;"></select>
+        </div>
+        <div id="previewContent"></div>
+    </section>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
