@@ -1,101 +1,101 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Normalisation Excel</title>
+    <title>Excel Normalization</title>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 <div class="container">
-    <h1>Normalisation de fichiers Excel</h1>
+    <h1>Excel File Normalization</h1>
     <p class="subtitle">
-        Sélectionnez uniquement les colonnes que vous souhaitez modifier.
+        Select only the columns you want to modify.
     </p>
 
     <div id="status" class="status"></div>
 
     <section class="card">
-        <h2>1. Fichier source</h2>
+        <h2>1. Source file</h2>
         <input id="excelFile" type="file" accept=".xlsx,.xls,.xlsm,.csv">
-        <p class="hint">Le fichier est traité localement dans votre navigateur.</p>
+        <p class="hint">The file is processed locally in your browser.</p>
     </section>
 
     <section id="scopeCard" class="card">
-        <h2>2. Colonnes à modifier</h2>
+        <h2>2. Columns to modify</h2>
         <p class="hint" style="margin-bottom:10px;">
-            Par défaut, aucune colonne n’est sélectionnée.
-            Cochez uniquement les colonnes à normaliser.
+            By default, no column is selected.
+            Check only the columns to normalize.
         </p>
         <div class="actions" style="margin-bottom:11px;">
             <button type="button" class="secondary-button" onclick="selectAllSheets(true)">
-                Activer toutes les feuilles
+                Enable all sheets
             </button>
             <button type="button" class="secondary-button" onclick="selectAllSheets(false)">
-                Désactiver toutes les feuilles
+                Disable all sheets
             </button>
         </div>
         <div id="scopePanel"></div>
     </section>
 
     <section class="card">
-        <h2>3. Options de normalisation</h2>
+        <h2>3. Normalization options</h2>
         <div class="field">
-            <label for="spaceMode">Gestion des espaces</label>
+            <label for="spaceMode">Whitespace handling</label>
             <select id="spaceMode">
-                <option value="unchanged">Conserver les espaces</option>
-                <option value="trim">Supprimer les espaces au début et à la fin</option>
-                <option value="underscore">Remplacer les espaces par _</option>
+                <option value="unchanged">Keep spaces</option>
+                <option value="trim">Trim leading and trailing spaces</option>
+                <option value="underscore">Replace spaces with _</option>
             </select>
-            <p class="hint">Exemple : « Rear Left Door » devient « Rear_Left_Door ».</p>
+            <p class="hint">Example: "Rear Left Door" becomes "Rear_Left_Door".</p>
         </div>
         <div class="checkbox-line">
             <input id="capitalizeFirst" type="checkbox">
-            <label for="capitalizeFirst">Mettre une majuscule au début des cellules sélectionnées</label>
+            <label for="capitalizeFirst">Capitalize the first letter of selected cells</label>
         </div>
         <div class="checkbox-line">
             <input id="ignoreHeaders" type="checkbox" checked>
-            <label for="ignoreHeaders">Ne pas modifier la première ligne</label>
+            <label for="ignoreHeaders">Do not modify the first row</label>
         </div>
         <div class="field" style="margin-top:12px;">
-            <label for="protectedTerms">Termes toujours en majuscules</label>
+            <label for="protectedTerms">Terms always in uppercase</label>
             <input id="protectedTerms" type="text" value="LHD, RHD" placeholder="LHD, RHD, SUV, OEM">
-            <p class="hint">Séparez les termes par des virgules.</p>
+            <p class="hint">Separate terms with commas.</p>
         </div>
     </section>
 
     <section class="card">
-        <h2>4. Règles métier</h2>
+        <h2>4. Business rules</h2>
         <p class="hint" style="margin-bottom:10px;">
-            L’option « Mot entier » empêche RH de modifier RHD et LH de modifier LHD.
+            The "Whole word" option prevents RH from changing RHD and LH from changing LHD.
         </p>
         <div class="rules-header">
-            <span>Active</span>
-            <span>Rechercher</span>
-            <span>Remplacer</span>
-            <span>Mot entier</span>
-            <span>Casse exacte</span>
+            <span>Enabled</span>
+            <span>Find</span>
+            <span>Replace</span>
+            <span>Whole word</span>
+            <span>Case sensitive</span>
             <span>Action</span>
         </div>
         <div id="customRules"></div>
         <button type="button" class="secondary-button" onclick="addRule()">
-            + Ajouter une règle
+            + Add a rule
         </button>
     </section>
 
     <section class="card">
-        <h2>5. Traitement</h2>
+        <h2>5. Processing</h2>
         <div class="actions">
-            <button id="processButton" type="button">Traiter les colonnes sélectionnées</button>
-            <button id="downloadButton" type="button" disabled>Télécharger le fichier normalisé</button>
+            <button id="processButton" type="button">Process selected columns</button>
+            <button id="downloadButton" type="button" disabled>Download normalized file</button>
         </div>
     </section>
 
     <section id="previewCard" class="card">
         <div class="preview-header">
             <div>
-                <h2 style="margin-bottom:4px;">Prévisualisation</h2>
+                <h2 style="margin-bottom:4px;">Preview</h2>
                 <span id="previewCounter" class="hint"></span>
             </div>
             <select id="sheetSelector" style="max-width:280px;"></select>
