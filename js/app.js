@@ -1,12 +1,12 @@
 "use strict";
 
 /* ============================================================
- *  Normalisation Excel - logique applicative
+ *  Excel Normalization - application logic
  * ============================================================ */
 
 let sourceWorkbook = null;
 let processedWorkbook = null;
-let sourceFileName = "fichier";
+let sourceFileName = "file";
 
 const fileInput = document.getElementById("excelFile");
 const processButton = document.getElementById("processButton");
@@ -18,21 +18,21 @@ processButton.addEventListener("click", processWorkbook);
 downloadButton.addEventListener("click", downloadWorkbook);
 sheetSelector.addEventListener("change", updatePreview);
 
-/* Règles métier par défaut. */
+/* Default business rules. */
 addRule("RH", "RHD", true, false, true);
 addRule("LH", "LHD", true, false, true);
 addRule("left hand drive", "LHD", false, false, true);
 addRule("right hand drive", "RHD", false, false, true);
 
 /* ------------------------------------------------------------
- *  Chargement du fichier
+ *  File loading
  * ---------------------------------------------------------- */
 async function loadWorkbook(event) {
     const file = event.target.files[0];
     if (!file) { return; }
 
     try {
-        setStatus("Chargement du fichier...", "info");
+        setStatus("Loading file...", "info");
         sourceFileName = file.name.replace(/\.[^.]+$/, "");
 
         const buffer = await file.arrayBuffer();
@@ -49,15 +49,15 @@ async function loadWorkbook(event) {
         document.getElementById("scopeCard").style.display = "block";
         document.getElementById("previewCard").style.display = "none";
 
-        setStatus(`${sourceWorkbook.SheetNames.length} feuille(s) chargée(s).`, "success");
+        setStatus(`${sourceWorkbook.SheetNames.length} sheet(s) loaded.`, "success");
     } catch (error) {
         console.error(error);
-        setStatus("Impossible de lire le fichier.", "error");
+        setStatus("Unable to read the file.", "error");
     }
 }
 
 /* ------------------------------------------------------------
- *  Construction du panneau de sélection des colonnes
+ *  Build the column selection panel
  * ---------------------------------------------------------- */
 function buildScopePanel() {
     const panel = document.getElementById("scopePanel");
@@ -86,19 +86,19 @@ function buildScopePanel() {
         sheetCheckbox.className = "sheet-enabled";
 
         sheetLabel.appendChild(sheetCheckbox);
-        sheetLabel.append(" Feuille active");
+        sheetLabel.append(" Sheet enabled");
         controls.appendChild(sheetLabel);
 
         const allButton = document.createElement("button");
         allButton.type = "button";
         allButton.className = "secondary-button";
-        allButton.textContent = "Toutes les colonnes";
+        allButton.textContent = "All columns";
         allButton.onclick = () => selectSheetColumns(details, true);
 
         const noneButton = document.createElement("button");
         noneButton.type = "button";
         noneButton.className = "secondary-button";
-        noneButton.textContent = "Aucune colonne";
+        noneButton.textContent = "No columns";
         noneButton.onclick = () => selectSheetColumns(details, false);
 
         controls.appendChild(allButton);
@@ -109,7 +109,7 @@ function buildScopePanel() {
             const emptyMessage = document.createElement("p");
             emptyMessage.className = "hint";
             emptyMessage.style.padding = "0 12px 10px";
-            emptyMessage.textContent = "Feuille vide.";
+            emptyMessage.textContent = "Empty sheet.";
             details.appendChild(emptyMessage);
             panel.appendChild(details);
             return;
@@ -124,12 +124,12 @@ function buildScopePanel() {
         table.innerHTML = `
             <thead>
                 <tr>
-                    <th>Modifier</th>
-                    <th>Colonne</th>
-                    <th>Nom détecté</th>
-                    <th>Type détecté</th>
-                    <th>Type à appliquer</th>
-                    <th>Majuscules / minuscules</th>
+                    <th>Modify</th>
+                    <th>Column</th>
+                    <th>Detected name</th>
+                    <th>Detected type</th>
+                    <th>Type to apply</th>
+                    <th>Uppercase / lowercase</th>
                 </tr>
             </thead>
         `;
@@ -156,7 +156,7 @@ function createColumnRow(sheet, range, columnIndex) {
 
     const detectedType = detectColumnType(sheet, columnIndex, range);
 
-    /* Colonne à modifier (décochée par défaut). */
+    /* Column to modify (unchecked by default). */
     const enabledCell = document.createElement("td");
     const enabledCheckbox = document.createElement("input");
     enabledCheckbox.type = "checkbox";
@@ -164,42 +164,42 @@ function createColumnRow(sheet, range, columnIndex) {
     enabledCheckbox.className = "column-enabled";
     enabledCell.appendChild(enabledCheckbox);
 
-    /* Lettre de la colonne. */
+    /* Column letter. */
     const letterCell = document.createElement("td");
     letterCell.textContent = XLSX.utils.encode_col(columnIndex);
 
-    /* Nom détecté. */
+    /* Detected name. */
     const nameCell = document.createElement("td");
     nameCell.className = "column-name";
-    nameCell.textContent = headerValue || "(sans en-tête)";
-    nameCell.title = headerValue || "(sans en-tête)";
+    nameCell.textContent = headerValue || "(no header)";
+    nameCell.title = headerValue || "(no header)";
 
-    /* Type détecté. */
+    /* Detected type. */
     const detectedTypeCell = document.createElement("td");
     detectedTypeCell.textContent = detectedType.label;
 
-    /* Type à appliquer. */
+    /* Type to apply. */
     const targetTypeCell = document.createElement("td");
     const typeSelect = document.createElement("select");
     typeSelect.className = "column-type";
     typeSelect.innerHTML = `
-        <option value="auto">Automatique</option>
-        <option value="text">Texte</option>
-        <option value="number">Nombre</option>
+        <option value="auto">Automatic</option>
+        <option value="text">Text</option>
+        <option value="number">Number</option>
         <option value="date">Date</option>
-        <option value="boolean">Booléen</option>
+        <option value="boolean">Boolean</option>
     `;
     typeSelect.value = "auto";
     targetTypeCell.appendChild(typeSelect);
 
-    /* Casse. */
+    /* Case. */
     const caseCell = document.createElement("td");
     const caseSelect = document.createElement("select");
     caseSelect.className = "column-case";
     caseSelect.innerHTML = `
-        <option value="unchanged">Conserver la casse</option>
-        <option value="lowercase">Tout en minuscules</option>
-        <option value="uppercase">Tout en MAJUSCULES</option>
+        <option value="unchanged">Keep case</option>
+        <option value="lowercase">All lowercase</option>
+        <option value="uppercase">All UPPERCASE</option>
     `;
     caseCell.appendChild(caseSelect);
 
@@ -237,18 +237,18 @@ function detectColumnType(sheet, columnIndex, range) {
     }
 
     if (inspected === 0) {
-        return { value: "auto", label: "Indéterminé" };
+        return { value: "auto", label: "Undetermined" };
     }
 
     const dominantType = Object.entries(counts)
         .sort((first, second) => second[1] - first[1])[0][0];
 
-    const labels = { text: "Texte", number: "Nombre", date: "Date", boolean: "Booléen" };
+    const labels = { text: "Text", number: "Number", date: "Date", boolean: "Boolean" };
     return { value: dominantType, label: labels[dominantType] };
 }
 
 /* ------------------------------------------------------------
- *  Sélections globales
+ *  Global selections
  * ---------------------------------------------------------- */
 function selectAllSheets(selected) {
     document.querySelectorAll(".sheet-enabled").forEach(checkbox => {
@@ -288,11 +288,11 @@ function getScopeConfiguration() {
 }
 
 /* ------------------------------------------------------------
- *  Traitement du classeur
+ *  Workbook processing
  * ---------------------------------------------------------- */
 function processWorkbook() {
     if (!sourceWorkbook) {
-        setStatus("Veuillez sélectionner un fichier.", "error");
+        setStatus("Please select a file.", "error");
         return;
     }
 
@@ -301,7 +301,7 @@ function processWorkbook() {
         const selectedColumns = countSelectedColumns(scope);
 
         if (selectedColumns === 0) {
-            setStatus("Sélectionnez au moins une colonne à modifier.", "error");
+            setStatus("Select at least one column to modify.", "error");
             return;
         }
 
@@ -362,16 +362,16 @@ function processWorkbook() {
         downloadButton.disabled = false;
         document.getElementById("previewCard").style.display = "block";
 
-        let message = `${selectedColumns} colonne(s) sélectionnée(s). ` +
-            `${modifiedCells} cellule(s) modifiée(s).`;
+        let message = `${selectedColumns} column(s) selected. ` +
+            `${modifiedCells} cell(s) modified.`;
         if (conversionErrors > 0) {
-            message += ` ${conversionErrors} valeur(s) non convertie(s).`;
+            message += ` ${conversionErrors} value(s) not converted.`;
         }
 
         setStatus(message, conversionErrors > 0 ? "info" : "success");
     } catch (error) {
         console.error(error);
-        setStatus("Erreur pendant le traitement.", "error");
+        setStatus("Error during processing.", "error");
     }
 }
 
@@ -387,7 +387,7 @@ function countSelectedColumns(scope) {
 }
 
 /* ------------------------------------------------------------
- *  Transformation d'une cellule
+ *  Cell transformation
  * ---------------------------------------------------------- */
 function transformCell(cell, columnConfiguration, settings, rules) {
     if (cell.v === null || cell.v === undefined || cell.v === "") {
@@ -410,7 +410,7 @@ function transformCell(cell, columnConfiguration, settings, rules) {
         if (cell.v instanceof Date) {
             textValue = formatDate(cell.v);
         } else if (cell.t === "b") {
-            textValue = cell.v ? "Oui" : "Non";
+            textValue = cell.v ? "Yes" : "No";
         } else {
             textValue = String(cell.v);
         }
@@ -432,7 +432,7 @@ function transformCell(cell, columnConfiguration, settings, rules) {
         if (!dateValue) { return { success: false }; }
         cell.v = dateValue;
         cell.t = "d";
-        cell.z = "dd/mm/yyyy";
+        cell.z = "mm/dd/yyyy";
         return { success: true };
     }
 
@@ -457,15 +457,15 @@ function normalizeText(value, caseMode, settings, rules) {
         result = result.trim().replace(/\s+/g, "_");
     }
 
-    /* Casse appliquée uniquement à la colonne sélectionnée. */
+    /* Case applied only to the selected column. */
     if (caseMode === "lowercase") {
-        result = result.toLocaleLowerCase("fr-FR");
+        result = result.toLocaleLowerCase("en-US");
     }
     if (caseMode === "uppercase") {
-        result = result.toLocaleUpperCase("fr-FR");
+        result = result.toLocaleUpperCase("en-US");
     }
 
-    /* Règles les plus longues d'abord (évite les collisions RH / RHD). */
+    /* Longest rules first (avoids RH / RHD collisions). */
     const orderedRules = [...rules].sort(
         (firstRule, secondRule) => secondRule.search.length - firstRule.search.length
     );
@@ -479,7 +479,7 @@ function normalizeText(value, caseMode, settings, rules) {
         result = executeReplacementRule(result, {
             enabled: true,
             search: cleanTerm,
-            replacement: cleanTerm.toLocaleUpperCase("fr-FR"),
+            replacement: cleanTerm.toLocaleUpperCase("en-US"),
             wholeWord: true,
             caseSensitive: false
         });
@@ -511,7 +511,7 @@ function executeReplacementRule(input, rule) {
 }
 
 /* ------------------------------------------------------------
- *  Options et règles
+ *  Options and rules
  * ---------------------------------------------------------- */
 function getSettings() {
     const protectedTerms = document.getElementById("protectedTerms").value
@@ -532,17 +532,17 @@ function addRule(searchValue = "", replacementValue = "", wholeWord = true, case
     row.className = "rule-row";
     row.innerHTML = `
         <div class="rule-checkbox">
-            <input class="rule-enabled" type="checkbox" title="Activer la règle">
+            <input class="rule-enabled" type="checkbox" title="Enable the rule">
         </div>
-        <input class="rule-search" type="text" placeholder="Texte recherché">
-        <input class="rule-replacement" type="text" placeholder="Remplacement">
+        <input class="rule-search" type="text" placeholder="Text to find">
+        <input class="rule-replacement" type="text" placeholder="Replacement">
         <div class="rule-checkbox">
-            <input class="rule-whole-word" type="checkbox" title="Mot entier">
+            <input class="rule-whole-word" type="checkbox" title="Whole word">
         </div>
         <div class="rule-checkbox">
-            <input class="rule-case-sensitive" type="checkbox" title="Respecter la casse">
+            <input class="rule-case-sensitive" type="checkbox" title="Case sensitive">
         </div>
-        <button type="button" class="danger-button">Supprimer</button>
+        <button type="button" class="danger-button">Delete</button>
     `;
 
     row.querySelector(".rule-enabled").checked = enabled;
@@ -568,7 +568,7 @@ function getCustomRules() {
 }
 
 /* ------------------------------------------------------------
- *  Convertisseurs de valeurs
+ *  Value converters
  * ---------------------------------------------------------- */
 function parseNumber(value) {
     if (typeof value === "number" && Number.isFinite(value)) {
@@ -642,9 +642,10 @@ function parseBoolean(value) {
     if (value === 1) { return true; }
     if (value === 0) { return false; }
 
-    const normalized = String(value).trim().toLocaleLowerCase("fr-FR");
-    const trueValues = ["oui", "yes", "true", "vrai", "1", "x"];
-    const falseValues = ["non", "no", "false", "faux", "0"];
+    const normalized = String(value).trim().toLocaleLowerCase("en-US");
+    /* English and French input values are both recognized. */
+    const trueValues = ["yes", "true", "1", "x", "oui", "vrai"];
+    const falseValues = ["no", "false", "0", "non", "faux"];
 
     if (trueValues.includes(normalized)) { return true; }
     if (falseValues.includes(normalized)) { return false; }
@@ -655,7 +656,7 @@ function capitalizeFirstLetter(value) {
     const characters = Array.from(value);
     for (let index = 0; index < characters.length; index++) {
         if (/\p{L}/u.test(characters[index])) {
-            characters[index] = characters[index].toLocaleUpperCase("fr-FR");
+            characters[index] = characters[index].toLocaleUpperCase("en-US");
             break;
         }
     }
@@ -663,7 +664,7 @@ function capitalizeFirstLetter(value) {
 }
 
 /* ------------------------------------------------------------
- *  Prévisualisation
+ *  Preview
  * ---------------------------------------------------------- */
 function populateSheetSelector() {
     sheetSelector.innerHTML = "";
@@ -689,14 +690,14 @@ function updatePreview() {
 
     renderPreview(rows.slice(0, 100));
     document.getElementById("previewCounter").textContent =
-        `${rows.length} ligne(s), aperçu limité à 100 lignes.`;
+        `${rows.length} row(s), preview limited to 100 rows.`;
 }
 
 function renderPreview(rows) {
     const container = document.getElementById("previewContent");
 
     if (!rows.length) {
-        container.innerHTML = "<p style='padding:12px;'>Feuille vide.</p>";
+        container.innerHTML = "<p style='padding:12px;'>Empty sheet.</p>";
         return;
     }
 
@@ -738,17 +739,17 @@ function renderPreview(rows) {
  * ---------------------------------------------------------- */
 function downloadWorkbook() {
     if (!processedWorkbook) {
-        setStatus("Aucun fichier traité.", "error");
+        setStatus("No file processed.", "error");
         return;
     }
 
-    const outputName = `${sourceFileName}_normalise.xlsx`;
+    const outputName = `${sourceFileName}_normalized.xlsx`;
     XLSX.writeFile(processedWorkbook, outputName, { compression: true });
-    setStatus(`Le fichier ${outputName} a été généré.`, "success");
+    setStatus(`File ${outputName} has been generated.`, "success");
 }
 
 /* ------------------------------------------------------------
- *  Utilitaires
+ *  Utilities
  * ---------------------------------------------------------- */
 function cloneWorksheet(sourceSheet) {
     const clone = {};
@@ -794,7 +795,7 @@ function valuesAreEqual(first, second) {
 }
 
 function formatDate(date) {
-    return new Intl.DateTimeFormat("fr-FR").format(date);
+    return new Intl.DateTimeFormat("en-US").format(date);
 }
 
 function escapeRegExp(value) {
