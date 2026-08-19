@@ -1,0 +1,7 @@
+cd normalisation-excel
+git init
+git add .
+git commit -m "Initial commit : outil de normalisation Excel"
+git branch -M main
+git remote add origin https://github.com/VOTRE-COMPTE/normalisation-excel.git
+git push -u origin main
